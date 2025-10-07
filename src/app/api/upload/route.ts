@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { pdf } from 'pdf-parse';
+import pdf from 'pdf-parse';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { GoogleGenerativeAIEmbeddings } from '@langchain/google-genai';
 import { SupabaseVectorStore } from '@langchain/community/vectorstores/supabase';
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     const embeddings = new GoogleGenerativeAIEmbeddings({
       apiKey: process.env.GOOGLE_API_KEY,
       // **NEW**: Specify the model
-      model: "text-embedding-004", 
+      modelName: "text-embedding-004", 
     });
 
     await SupabaseVectorStore.fromDocuments(filteredDocuments, embeddings, {

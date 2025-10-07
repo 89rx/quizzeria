@@ -1,72 +1,33 @@
 'use client';
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { ChatPanel } from '@/components/ChatPanel';
 
 export default function Home() {
-  const [file, setFile] = useState<File | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState('');
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setFile(event.target.files[0]);
-    }
-  };
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!file) {
-      setMessage('Please select a file first.');
-      return;
-    }
-
-    setIsLoading(true);
-    setMessage('');
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage(data.message || 'File uploaded successfully!');
-      } else {
-        setMessage(data.error || 'An error occurred during upload.');
-      }
-    } catch (error) {
-      console.error('Submission error:', error);
-      setMessage('An unexpected error occurred.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md rounded-lg border bg-white p-8 shadow-md">
-        <h1 className="mb-4 text-center text-2xl font-bold">
-          Upload Your Coursebook
+    // min-h-screen ensures main covers the full viewport
+    <main className="p-4 md:p-8 min-h-screen"> 
+      {/* Set the container height and make it a vertical flex column */}
+      <div className="mx-auto max-w-3xl space-y-4 flex flex-col h-[90vh]">
+        
+        {/* Header content does not use flex-1, so it takes only the height it needs */}
+        <h1 className="text-2xl font-bold text-center">
+          RAG Chat Application
         </h1>
-        <p className="mb-6 text-center text-sm text-gray-600">
-          Upload a PDF to start generating quizzes.
+        <p className="text-muted-foreground text-center">
+          Ask a question about the PDF document.
         </p>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <Input id="pdf" type="file" onChange={handleFileChange} />
-          <Button type="submit" disabled={isLoading} className="w-full">
-            {isLoading ? 'Uploading...' : 'Upload PDF'}
-          </Button>
-        </form>
-        {message && (
-          <p className="mt-4 text-center text-sm text-gray-700">{message}</p>
-        )}
+
+        {/* Chat Panel: The flex-1 ensures this div takes all available vertical space */}
+        <div className="flex-1 min-h-0"> 
+          {/* min-h-0 is a Tailwind/Flex trick to ensure the child can shrink and scroll */}
+          <ChatPanel />
+        </div>
+
+        {/* PDF Viewer Placeholder */}
+        <div className="h-40 flex items-center justify-center rounded-lg border">
+          <span className="font-semibold">PDF Viewer Panel Placeholder</span>
+        </div>
+        
       </div>
     </main>
   );
