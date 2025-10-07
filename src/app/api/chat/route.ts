@@ -5,6 +5,7 @@ import { PromptTemplate } from '@langchain/core/prompts';
 import { RunnableSequence, RunnablePassthrough } from '@langchain/core/runnables'; 
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { supabase } from '@/lib/supabaseClient';
+const CURRENT_DOCUMENT_NAME = "Assignment_ BeyondChats - FSWD.pdf";
 
 // Node.js runtime is the default and most stable for this complex streaming operation
 // export const runtime = 'edge'; 
@@ -22,6 +23,7 @@ export async function POST(req: Request) {
     const messages = body.messages ?? [];
     const formattedPreviousMessages = messages.slice(0, -1).map(formatVercelMessages);
     const currentMessageContent = messages[messages.length - 1]?.content;
+    
 
     if (!currentMessageContent) {
       return new Response(JSON.stringify({ error: 'No message content found' }), { status: 400 });

@@ -1,6 +1,7 @@
 'use client';
 
 import { ChatPanel } from '@/components/ChatPanel';
+import { FileUpload } from '@/components/FileUpload';
 
 export default function Home() {
   return (
@@ -23,9 +24,9 @@ export default function Home() {
           <ChatPanel />
         </div>
 
-        {/* PDF Viewer Placeholder */}
-        <div className="h-40 flex items-center justify-center rounded-lg border">
-          <span className="font-semibold">PDF Viewer Panel Placeholder</span>
+         {/* FILE UPLOAD COMPONENT (Replaces Placeholder) */}
+         <div className="h-auto flex items-center justify-center p-4 rounded-lg border">
+          <FileUpload /> 
         </div>
         
       </div>
