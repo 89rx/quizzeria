@@ -8,6 +8,9 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "overrides": {
+    "pdfjs-dist": "4.4.168"
+  },
   "dependencies": {
     "@langchain/community": "^0.0.43",
     "@langchain/core": "^0.1.6",
@@ -31,7 +34,8 @@
     "react-resizable-panels": "^2.0.16",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "react-pdf": "^9.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

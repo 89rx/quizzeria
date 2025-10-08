@@ -1,35 +1,74 @@
+// src/app/page.tsx
 'use client';
 
+import { useState } from 'react';
 import { ChatPanel } from '@/components/ChatPanel';
-import { FileUpload } from '@/components/FileUpload';
+import { PDFViewer } from '@/components/PDFViewer';
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable" // Assuming you have this from ShadCN/UI
 
 export default function Home() {
+  const [file, setFile] = useState<File | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<'initial' | 'uploading' | 'success' | 'error'>('initial');
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  // This logic is now lifted up to the parent page component
+  const handleUpload = async () => {
+    if (!file) return;
+
+    setUploadStatus('uploading');
+    setUploadError(null);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch('/api/ingest', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        setUploadStatus('success');
+        alert("PDF Indexed Successfully! You can now ask questions about it.");
+      } else {
+        const errorData = await response.json();
+        setUploadError(`Upload Failed: ${errorData.error || response.statusText}`);
+        setUploadStatus('error');
+        alert(`Upload Failed: ${errorData.error || response.statusText}`);
+      }
+    } catch (err) {
+      setUploadError('A network error occurred during upload.');
+      setUploadStatus('error');
+      alert('A network error occurred during upload.');
+    }
+  };
+
+
   return (
-    // min-h-screen ensures main covers the full viewport
-    <main className="p-4 md:p-8 min-h-screen"> 
-      {/* Set the container height and make it a vertical flex column */}
-      <div className="mx-auto max-w-3xl space-y-4 flex flex-col h-[90vh]">
+    <main className="h-screen bg-gray-50">
+      <ResizablePanelGroup direction="horizontal" className="h-full w-full">
+        <ResizablePanel defaultSize={50}>
+          <div className="p-4 h-full">
+            <PDFViewer 
+              file={file} 
+              handleUpload={handleUpload}
+              isUploading={uploadStatus === 'uploading'} 
+            />
+          </div>
+        </ResizablePanel>
         
-        {/* Header content does not use flex-1, so it takes only the height it needs */}
-        <h1 className="text-2xl font-bold text-center">
-          RAG Chat Application
-        </h1>
-        <p className="text-muted-foreground text-center">
-          Ask a question about the PDF document.
-        </p>
-
-        {/* Chat Panel: The flex-1 ensures this div takes all available vertical space */}
-        <div className="flex-1 min-h-0"> 
-          {/* min-h-0 is a Tailwind/Flex trick to ensure the child can shrink and scroll */}
-          <ChatPanel />
-        </div>
-
-         {/* FILE UPLOAD COMPONENT (Replaces Placeholder) */}
-         <div className="h-auto flex items-center justify-center p-4 rounded-lg border">
-          <FileUpload /> 
-        </div>
+        <ResizableHandle withHandle />
         
-      </div>
+        <ResizablePanel defaultSize={50}>
+          <div className="p-4 h-full">
+            <ChatPanel onFileSelect={setFile} />
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </main>
   );
 }
