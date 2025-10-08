@@ -1,22 +1,24 @@
 // src/components/ChatPanel.tsx
 'use client';
 
-import { useChat } from 'ai/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { useRef, useEffect, Dispatch, SetStateAction } from 'react'; // Import Dispatch and SetStateAction
-import { Paperclip } from 'lucide-react';
+import { useRef, useEffect, Dispatch, SetStateAction } from 'react';
+import { Paperclip, Send } from 'lucide-react';
+import type { Message } from 'ai/react';
 
-// CORRECTED PROP TYPE DEFINITION
 interface ChatPanelProps {
+  messages: Message[];
+  input: string;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => void;
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   onFileSelect: Dispatch<SetStateAction<File | null>>;
+  chatId: string | null;
+  isLoading: boolean;
 }
 
-export function ChatPanel({ onFileSelect }: ChatPanelProps) {
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
-    api: '/api/chat',
-  });
+export function ChatPanel({ messages, input, handleInputChange, handleSubmit, onFileSelect, chatId, isLoading }: ChatPanelProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -30,6 +32,8 @@ export function ChatPanel({ onFileSelect }: ChatPanelProps) {
       onFileSelect(file);
     }
   };
+  
+  const isInputDisabled = isLoading || !chatId;
 
   return (
     <div className="flex flex-col h-full bg-white rounded-lg border">
@@ -39,54 +43,46 @@ export function ChatPanel({ onFileSelect }: ChatPanelProps) {
 
       <div className="flex-1 p-4 overflow-y-auto">
         <div className="flex flex-col gap-4">
-          {messages.length > 0 ? (
-            messages.map((m) => (
-              <div
-                key={m.id}
-                className={cn(
-                  'p-3 rounded-lg text-sm whitespace-pre-wrap max-w-[80%]',
-                  m.role === 'user'
-                    ? 'bg-blue-600 text-white self-end'
-                    : 'bg-gray-100 self-start'
-                )}
-              >
-                {m.content}
-              </div>
-            ))
-          ) : (
-            <p className="text-muted-foreground">Ask a question to get started.</p>
+          {!chatId && messages.length === 0 && (
+            <div className="text-center text-muted-foreground mt-8">
+              <p>Please start a new chat or select an existing one.</p>
+              <p className='text-sm'>To begin, upload a PDF.</p>
+            </div>
           )}
+          {messages.map((m) => (
+            <div
+              key={m.id}
+              className={cn(
+                'p-3 rounded-lg text-sm whitespace-pre-wrap max-w-[80%]',
+                m.role === 'user'
+                  ? 'bg-blue-600 text-white self-end'
+                  : 'bg-gray-100 self-start'
+              )}
+            >
+              {m.content}
+            </div>
+          ))}
           <div ref={messagesEndRef} />
         </div>
       </div>
 
       <div className="p-4 border-t">
         <form onSubmit={handleSubmit} className="w-full flex items-center gap-2">
-          {/* Hidden file input */}
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept="application/pdf"
-            className="hidden"
-          />
-
-          {/* Attach Button */}
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={() => fileInputRef.current?.click()}
-          >
+          <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="application/pdf" className="hidden" />
+          
+          <Button type="button" variant="ghost" size="icon" onClick={() => fileInputRef.current?.click()}>
             <Paperclip className="h-5 w-5" />
           </Button>
 
           <Input
             value={input}
             onChange={handleInputChange}
-            placeholder="Ask a question about the PDF..."
+            placeholder={!chatId ? "Upload a PDF to start..." : "Ask a question..."}
+            disabled={isInputDisabled}
           />
-          <Button type="submit">Send</Button>
+          <Button type="submit" disabled={isInputDisabled}>
+            <Send className="h-5 w-5" />
+          </Button>
         </form>
       </div>
     </div>
