@@ -1,13 +1,17 @@
-// src/app/api/chat/route.ts
-
 import { StreamingTextResponse, Message as VercelChatMessage } from 'ai';
-import { SupabaseVectorStore } from '@langchain/community/vectorstores/supabase';
 import { GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { RunnableSequence, RunnablePassthrough } from '@langchain/core/runnables'; 
 import { StringOutputParser } from '@langchain/core/output_parsers';
 import { supabase } from '@/lib/supabaseClient';
 import { Document } from '@langchain/core/documents';
+
+type DocumentFromRPC = {
+  id: number;
+  content: string;
+  metadata: Record<string, any>;
+  similarity: number;
+};
 
 const formatVercelMessages = (message: VercelChatMessage) => {
   return message.role === 'user' ? `User: ${message.content}` : `Assistant: ${message.content}`;
@@ -23,8 +27,6 @@ export async function POST(req: Request) {
     const messages = body.messages ?? [];
     const chatId = body.chatId as string | undefined;
 
-    console.log(`[API CHAT] Received request for chat ID: ${chatId}`);
-
     if (!chatId) {
       return new Response(JSON.stringify({ error: 'No active chat session found.' }), { status: 400 });
     }
@@ -38,7 +40,7 @@ export async function POST(req: Request) {
     
     const model = new ChatGoogleGenerativeAI({
       apiKey: process.env.GOOGLE_API_KEY,
-      modelName: "gemini-2.5-flash", 
+      modelName: "gemini-2.5-flash",
       streaming: true,
     });
 
@@ -47,51 +49,37 @@ export async function POST(req: Request) {
       modelName: "text-embedding-004",
     });
 
-    const vectorStore = new SupabaseVectorStore(embeddings, {
-      client: supabase,
-      tableName: 'documents',
-      queryName: 'match_documents',
+    const { data: documents, error } = await supabase.rpc('match_documents', {
+      query_embedding: await embeddings.embedQuery(currentMessageContent),
+      match_count: 4,
+      p_chat_id: chatId
     });
 
-    const relevantDocs = await vectorStore.similaritySearch(
-      currentMessageContent,
-      4, 
-      { chat_id: chatId } 
-  );
-  
-  // --- NEW DEBUG LOG ---
-  // This log will show us the metadata of the docs that were found.
-  console.log('[API CHAT] Metadata of retrieved docs:', relevantDocs.map(doc => doc.metadata));
-  // --- END NEW LOG ---
-  
-  console.log('[API CHAT] Documents Retrieved:', relevantDocs.length);
-  const context = combineDocuments(relevantDocs);
-  // ... the rest of the file is the same ...
-    
-    console.log('[API CHAT] Documents Retrieved:', relevantDocs.length);
+    if (error) {
+      console.error('[API CHAT] Error from RPC call:', error);
+      throw new Error(`Error searching for documents: ${error.message}`);
+    }
 
-    console.log('[API CHAT] Context being sent to LLM:', context.substring(0, 200) + '...');
+    const relevantDocs = documents
+      ? documents.map((doc: DocumentFromRPC) => new Document({
+          pageContent: doc.content,
+          metadata: doc.metadata
+        }))
+      : [];
+    
+    const context = combineDocuments(relevantDocs);
 
     const prompt = PromptTemplate.fromTemplate(`
-      You are a helpful study assistant. Use the following context from a document to answer the user's question.
-      If you don't know the answer from the context, say that you don't know. Do not make up an answer.
-
-      Context:
-      {context}
-
-      Chat History:
-      {chat_history}
-
-      Question:
-      {question}
-
+      You are a helpful study assistant. Use the following context to answer the user's question.
+      If the context is empty, say that you don't know the answer from the provided context.
+      Context: {context}
+      Question: {question}
       Answer:
     `);
     
-    // --- START OF FIX: Reverting to your original, proven chain structure ---
     const chain = RunnableSequence.from([
         RunnablePassthrough.assign({
-            context: () => context, // Use the context we already fetched
+            context: () => context,
             question: () => currentMessageContent,
             chat_history: () => formattedPreviousMessages,
         }),
@@ -101,14 +89,11 @@ export async function POST(req: Request) {
     ]);
 
     const stream = await chain.stream({}); 
-    // --- END OF FIX ---
 
     return new StreamingTextResponse(stream);
     
   } catch (error) {
     console.error(`[RAG ERROR] Full Server Error:`, error);
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
-      status: 500,
-    });
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
   }
 }
