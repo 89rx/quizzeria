@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -23,21 +22,29 @@ interface ProgressData {
 export function DashboardView() {
   const [progress, setProgress] = useState<ProgressData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      // Add cache-busting parameter to prevent caching
+      const response = await fetch(`/api/progress?t=${Date.now()}`);
+      const data = await response.json();
+      setProgress(data);
+      setLastUpdated(new Date());
+    } catch (error) {
+      console.error("Failed to fetch progress", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch('/api/progress');
-        const data = await response.json();
-        setProgress(data);
-      } catch (error) {
-        console.error("Failed to fetch progress", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchData();
+    
+    // Refresh data every 30 seconds to show updates
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   if (isLoading) {
@@ -57,10 +64,14 @@ export function DashboardView() {
 
   return (
     <Card className="border-0 shadow-none">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Your Progress Summary</CardTitle>
+            {lastUpdated && (
+              <div className="text-sm text-muted-foreground">
+                Updated: {lastUpdated.toLocaleTimeString()}
+              </div>
+            )}
         </CardHeader>
-     
         <CardContent className="max-h-[60vh] overflow-y-auto">
             <Table>
                 <TableHeader>
