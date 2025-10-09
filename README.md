@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+# Quizzeria
 
-First, run the development server:
+Quizzeria is a web app which I designed to help students study more effectively by turning their PDF coursebooks into interactive learning tools. You can upload your documents, chat with them to ask questions, and generate quizzes to test your knowledge!
+
+**Live Link:** https://quizzeria-seven.vercel.app
+
+
+
+## Tech Stack
+
+**Client:** Next.js, Redux, TailwindCSS
+**Backend:** Next.js API Routes
+**Database:** Supabase
+**AI/LLM:** Google Gemini 2.5 Flash, LangChain.js
+**PDF Processing:** pdf-parse
+
+
+## 🔗 Links
+[![Vercel](https://img.shields.io/badge/Vercel-%23000000.svg?logo=vercel&logoColor=white)](https://quizzeria-seven.vercel.app)
+[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/ayan-sinha21/)
+[![GitHub](https://img.shields.io/badge/GitHub-%23121011.svg?logo=github&logoColor=white)](https://github.com/89rx/quizzeria)
+
+
+## Run Locally
+
+Clone the project
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+  git clone https://github.com/89rx/quizzeria.git](https://github.com/89rx/quizzeria.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Install dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+  npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Start the server
 
-## Learn More
+```bash
+  npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment Variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+To run this project, you will need to add the following environment variables to your .env.local file
 
-## Deploy on Vercel
+NEXT_PUBLIC_SUPABASE_URL=https://afcwhoinwxtmlxatopfk.supabase.co
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmY3dob2lud3h0bWx4YXRvcGZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3NzQ0NzMsImV4cCI6MjA3NTM1MDQ3M30.611kXJmAzyA3-UMQoEgne6MWf8gxwQtAhbhIlRP9vHo
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+GOOGLE_API_KEY=AIzaSyA3_LM-vTopWkioMbXvvKCdbzVQIyrBtJA
+
+## Features
+
+- PDF Upload & Source Selection
+- PDF Viewer
+- Quiz Engine
+- Progress Tracking Dashboard
+- AI-Powered Chat
+
+Please note that I could not add the YouTube Video Recommender and the Citations. While the groundwork for getting page numbers is there, I couldn't get the final implementation done. I have my midterms going on currently and managing both in 3 days was not enough :(
+
+
+## LLM Tools
+
+This project uses Large Language Models pretty heavily for its main features:
+
+- Quiz Generation
+- Chat (RAG)
+- Topic Extraction (for the Progress Dashboard)
+- Chat Title Generation
+## Conclusion
+
+Overall, I had a lot of fun working on this project! It was a great learning experience, especially when it came to building a full RAG (Retrieval-Augmented Generation) pipeline from scratch and managing the state of a multi-panel, interactive application. A lot of the things were new to me and I'm glad to have been a part of this process. Hope you guys like it :D
+
