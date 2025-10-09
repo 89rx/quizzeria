@@ -1,9 +1,9 @@
 'use client';
 
-import { PlusCircle } from 'lucide-react';
+import { forwardRef } from 'react';
 import { Button } from './ui/button';
+import { PlusCircle, LayoutDashboard } from 'lucide-react'; 
 
-// Add the optional title property to the Chat type
 export type Chat = {
   id: string;
   created_at: string;
@@ -14,17 +14,24 @@ interface ChatHistoryProps {
   chats: Chat[];
   currentChatId: string | null;
   setCurrentChatId: (chatId: string | null) => void;
+  onShowDashboard: () => void;
 }
 
-export function ChatHistory({ chats, currentChatId, setCurrentChatId }: ChatHistoryProps) {
+export const ChatHistory = forwardRef<HTMLDivElement, ChatHistoryProps>(({ chats, currentChatId, setCurrentChatId, onShowDashboard }, ref) => {
   return (
-    <div className="flex flex-col h-full bg-white rounded-lg border p-4">
+    <div ref={ref} className="flex flex-col h-full bg-white rounded-lg border p-4">
       <div className="flex justify-between items-center border-b pb-4">
         <h2 className="font-bold text-lg">Chat History</h2>
-        <Button size="sm" onClick={() => setCurrentChatId(null)}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          New Chat
-        </Button>
+        <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={onShowDashboard}>
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                Progress
+            </Button>
+            <Button size="sm" onClick={() => setCurrentChatId(null)}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              New Chat
+            </Button>
+        </div>
       </div>
       <div className="flex-1 overflow-y-auto mt-4 space-y-2">
         {chats.length > 0 ? (
@@ -36,7 +43,6 @@ export function ChatHistory({ chats, currentChatId, setCurrentChatId }: ChatHist
               onClick={() => setCurrentChatId(chat.id)}
             >
               <div className="truncate">
-                {/* Display the title, or fall back to a default name */}
                 {chat.title || `Chat from ${new Date(chat.created_at).toLocaleString()}`}
               </div>
             </Button>
@@ -47,4 +53,6 @@ export function ChatHistory({ chats, currentChatId, setCurrentChatId }: ChatHist
       </div>
     </div>
   );
-}
+});
+
+ChatHistory.displayName = 'ChatHistory';

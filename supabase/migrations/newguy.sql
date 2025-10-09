@@ -34,6 +34,33 @@ RETURNS TABLE (
 ALTER TABLE chats
 ADD COLUMN title TEXT;
 
+-- Create a table to store generated quizzes
+CREATE TABLE quizzes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    parent_chat_id UUID REFERENCES chats(id) ON DELETE CASCADE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Create a table to store the questions for each quiz
+CREATE TABLE questions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    quiz_id UUID REFERENCES quizzes(id) ON DELETE CASCADE,
+    question_text TEXT NOT NULL,
+    question_type TEXT NOT NULL, -- 'MCQ' or 'SAQ'
+    options JSONB, -- For MCQ choices
+    correct_answer TEXT NOT NULL,
+    explanation TEXT
+);
+
+-- Create a table to store user attempts
+CREATE TABLE user_attempts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    quiz_id UUID REFERENCES quizzes(id) ON DELETE CASCADE,
+    user_answers JSONB NOT NULL,
+    score INT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 LANGUAGE plpgsql
 AS $$
 BEGIN

@@ -1,29 +1,33 @@
 'use client';
 
+// 1. Import `forwardRef` from React
+import { forwardRef, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { useRef, useEffect, Dispatch, SetStateAction } from 'react';
-import { Paperclip, Send, Loader2 } from 'lucide-react';
 import type { Message } from 'ai/react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Paperclip, Send, Loader2, GraduationCap } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 interface ChatPanelProps {
   messages: Message[];
   input: string;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  onFileSelectAndUpload: (files: File[]) => void; // New prop
+  onFileSelectAndUpload: (files: File[]) => void;
   chatId: string | null;
   isLoading: boolean;
   indexedDocs: string[];
   indexedDocCount: number;
   selectedDoc: string;
   setSelectedDoc: (value: string) => void;
+  onGenerateQuiz: () => void;
 }
 
-export function ChatPanel({ messages, input, handleInputChange, handleSubmit, onFileSelectAndUpload, chatId, isLoading, indexedDocs, indexedDocCount, selectedDoc, setSelectedDoc }: ChatPanelProps) {
+// 2. Wrap the component definition in `forwardRef`
+export const ChatPanel = forwardRef<HTMLDivElement, ChatPanelProps>(({ messages, input, handleInputChange, handleSubmit, onFileSelectAndUpload, chatId, isLoading, indexedDocs, indexedDocCount, selectedDoc, setSelectedDoc, onGenerateQuiz }, ref) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -36,7 +40,6 @@ export function ChatPanel({ messages, input, handleInputChange, handleSubmit, on
         alert(`You can only have a maximum of 5 documents per chat. You have already indexed ${indexedDocCount}.`);
         return;
       }
-      // Immediately trigger the upload process
       onFileSelectAndUpload(Array.from(files));
     }
   };
@@ -45,7 +48,8 @@ export function ChatPanel({ messages, input, handleInputChange, handleSubmit, on
   const isFileLimitReached = indexedDocCount >= 5;
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-lg border">
+    // 3. Attach the forwarded `ref` to the main div element
+    <div ref={ref} className="flex flex-col h-full bg-white rounded-lg border">
       <div className="p-4 border-b flex justify-between items-center">
         <h1 className="font-bold text-lg">Chat</h1>
         {chatId && indexedDocs.length > 0 && (
@@ -77,20 +81,32 @@ export function ChatPanel({ messages, input, handleInputChange, handleSubmit, on
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <div className="relative">
-                  <Button type="button" variant="ghost" size="icon" onClick={() => fileInputRef.current?.click()} disabled={isFileLimitReached || isLoading}>
-                    {isLoading && !messages.length ? <Loader2 className="h-5 w-5 animate-spin" /> : <Paperclip className="h-5 w-5" />}
-                  </Button>
-                </div>
+                <Button type="button" variant="ghost" size="icon" onClick={() => fileInputRef.current?.click()} disabled={isFileLimitReached || isLoading}>
+                  {isLoading && !messages.length ? <Loader2 className="h-5 w-5 animate-spin" /> : <Paperclip className="h-5 w-5" />}
+                </Button>
               </TooltipTrigger>
               {isFileLimitReached && ( <TooltipContent><p>Maximum of 5 documents per chat reached.</p></TooltipContent> )}
             </Tooltip>
           </TooltipProvider>
 
           <Input value={input} onChange={handleInputChange} placeholder={!chatId ? "Upload PDFs to start..." : "Ask a question..."} disabled={isInputDisabled} />
+          
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button type="button" variant="ghost" size="icon" onClick={onGenerateQuiz} disabled={!chatId || isLoading}>
+                  <GraduationCap className="h-5 w-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent><p>Generate Quiz from Documents</p></TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
           <Button type="submit" disabled={isInputDisabled}><Send className="h-5 w-5" /></Button>
         </form>
       </div>
     </div>
   );
-}
+});
+
+ChatPanel.displayName = 'ChatPanel';
