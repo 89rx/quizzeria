@@ -20,10 +20,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'File or parentChatId not found.' }, { status: 400 });
     }
 
-    if (file.size > 4 * 1024 * 1024) {
+    if (file.size > 3 * 1024 * 1024) {
       return NextResponse.json({ 
         success: false, 
-        error: 'File too large (max 4MB)' 
+        error: 'File too large (max 3MB)' 
       }, { status: 400 });
     }
 

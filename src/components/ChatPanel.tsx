@@ -37,11 +37,11 @@ export const ChatPanel = forwardRef<HTMLDivElement, ChatPanelProps>(({ messages,
     const files = event.target.files;
     if (files && files.length > 0) {
       
-      // Check file size limit (4MB)
-      const oversizedFiles = Array.from(files).filter(file => file.size > 4 * 1024 * 1024);
+      
+      const oversizedFiles = Array.from(files).filter(file => file.size > 3 * 1024 * 1024);
       if (oversizedFiles.length > 0) {
-        alert(`Some files exceed the 4MB limit:\n${oversizedFiles.map(f => `• ${f.name} (${(f.size / 1024 / 1024).toFixed(1)}MB)`).join('\n')}\n\nPlease upload smaller PDF files.`);
-        // Clear the input
+        alert(`Some files exceed the 3MB limit:\n${oversizedFiles.map(f => `• ${f.name} (${(f.size / 1024 / 1024).toFixed(1)}MB)`).join('\n')}\n\nPlease upload smaller PDF files.`);
+        
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
@@ -93,7 +93,7 @@ export const ChatPanel = forwardRef<HTMLDivElement, ChatPanelProps>(({ messages,
               <p className="text-lg font-medium text-gray-700">Welcome to Study Assistant</p>
               <p className="text-sm text-gray-500 mt-2">Start a new chat and upload PDFs to begin learning</p>
               <div className="mt-4 text-xs text-gray-400 bg-blue-50 p-3 rounded border">
-                <p><strong>Note:</strong> PDF files must be under 4MB</p>
+                <p><strong>Note:</strong> PDF files must be under 3MB</p>
               </div>
             </div>
           )}
@@ -174,7 +174,7 @@ export const ChatPanel = forwardRef<HTMLDivElement, ChatPanelProps>(({ messages,
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Upload PDF files (max 4MB each)</p>
+                <p>Upload PDF files (max 3MB each)</p>
                 {isFileLimitReached && (
                   <p className="text-red-500">Maximum of 5 documents reached</p>
                 )}
@@ -219,9 +219,9 @@ export const ChatPanel = forwardRef<HTMLDivElement, ChatPanelProps>(({ messages,
           </Button>
         </form>
         
-        {/* File size info */}
+        
         <div className="mt-2 text-xs text-gray-500 text-center">
-          <p>PDF files must be under 4MB • Max 5 documents per chat</p>
+          <p>PDF files must be under 3MB • Max 5 documents per chat</p>
         </div>
       </div>
     </div>
