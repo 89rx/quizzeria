@@ -1,4 +1,4 @@
-// src/components/DashboardView.tsx
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -60,7 +60,7 @@ export function DashboardView() {
         <CardHeader>
             <CardTitle>Your Progress Summary</CardTitle>
         </CardHeader>
-        {/* ADDED max-h-[60vh] and overflow-y-auto FOR SCROLLING */}
+     
         <CardContent className="max-h-[60vh] overflow-y-auto">
             <Table>
                 <TableHeader>

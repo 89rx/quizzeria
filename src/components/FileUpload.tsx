@@ -5,7 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import { Button } from '@/components/ui/button';
 import { Upload, FileText, Loader2, X } from 'lucide-react';
 
-// Define the component's state
+
 type UploadState = 'initial' | 'uploading' | 'success' | 'error';
 
 export function FileUpload() {
@@ -13,7 +13,7 @@ export function FileUpload() {
   const [uploadStatus, setUploadStatus] = useState<UploadState>('initial');
   const [error, setError] = useState<string | null>(null);
 
-  // Function to handle the file drop
+
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
       const selectedFile = acceptedFiles[0];
@@ -23,7 +23,7 @@ export function FileUpload() {
       } else {
         setFile(selectedFile);
         setError(null);
-        setUploadStatus('initial'); // Reset status when a new file is selected
+        setUploadStatus('initial'); 
       }
     }
   }, []);
@@ -36,7 +36,6 @@ export function FileUpload() {
     },
   });
 
-  // Function to handle file submission to the /api/ingest route
   const handleUpload = async () => {
     if (!file) return;
 
@@ -47,7 +46,7 @@ export function FileUpload() {
     formData.append('file', file);
 
     try {
-      // FIX: The fetch request now correctly points to your ingest API route
+      
       const response = await fetch('/api/ingest', {
         method: 'POST',
         body: formData,
@@ -55,12 +54,12 @@ export function FileUpload() {
 
       if (response.ok) {
         setUploadStatus('success');
-        // You can optionally clear the file after a delay to show the success state
+      
         setTimeout(() => {
           setFile(null);
           setUploadStatus('initial');
         }, 2000); 
-        // Logic to refresh chat list or context would go here
+      
       } else {
         const errorData = await response.json();
         setError(`Upload Failed: ${errorData.error || response.statusText}`);
@@ -74,7 +73,7 @@ export function FileUpload() {
   
   return (
     <div className="flex flex-col space-y-4 w-full max-w-md">
-      {/* Dropzone Area */}
+
       <div
         {...getRootProps()}
         className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
@@ -88,7 +87,6 @@ export function FileUpload() {
         </p>
       </div>
 
-      {/* File Preview and Status */}
       {file && (
         <div className="flex items-center justify-between p-3 border rounded-md bg-gray-50">
           <div className="flex items-center space-x-2 overflow-hidden">
@@ -106,7 +104,7 @@ export function FileUpload() {
         </div>
       )}
 
-      {/* Upload Button and Progress */}
+
       <Button
         onClick={handleUpload}
         disabled={!file || uploadStatus === 'uploading'}
@@ -124,7 +122,7 @@ export function FileUpload() {
         )}
       </Button>
 
-      {/* Status Message */}
+
       {error && (
         <p className="text-sm text-center text-red-500">
             {error}

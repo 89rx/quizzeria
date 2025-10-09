@@ -7,6 +7,11 @@ import { ChatPanel } from '@/components/ChatPanel';
 import { PDFViewer } from '@/components/PDFViewer';
 import { ChatHistory, type Chat } from '@/components/ChatHistory';
 import { supabase } from '@/lib/supabaseClient';
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
 import { QuizView } from '@/components/QuizView';
 import { QuizResult } from '@/components/QuizResult';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -202,41 +207,55 @@ export default function Home() {
   };
 
   return (
-    <main className="h-screen bg-gray-50 flex flex-row p-4 gap-4">
-      <div className="w-[25%] min-w-[250px] h-full">
-        <ChatHistory 
-          chats={chats}
-          currentChatId={parentChatId}
-          setCurrentChatId={setParentChatId}
-          onShowDashboard={handleShowDashboard}
-        />
-      </div>
+    <main className="h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-50 p-4">
+      <ResizablePanelGroup direction="horizontal" className="h-full rounded-lg">
+     
+        <ResizablePanel defaultSize={25} minSize={16} maxSize={35} className="min-w-[200px]">
+          <div className="h-full pr-2">
+            <ChatHistory 
+              chats={chats}
+              currentChatId={parentChatId}
+              setCurrentChatId={setParentChatId}
+              onShowDashboard={handleShowDashboard}
+            />
+          </div>
+        </ResizablePanel>
 
-      <div className="w-[37.5%] min-w-[400px] h-full">
-        {viewMode === 'chat' && <PDFViewer file={fileToView} isUploading={isUploading || isGeneratingQuiz} />}
-        {viewMode === 'quiz' && quizData && <QuizView quizData={quizData} onSubmit={handleSubmitQuiz} isSubmitting={isSubmittingQuiz}/>}
-        {viewMode === 'result' && quizResult && <QuizResult resultData={quizResult} onFinish={resetToChatView}/>}
-      </div>
+        <ResizableHandle withHandle className="bg-gray-300/50 hover:bg-gray-400/60 transition-colors" />
 
-      <div className="w-[37.5%] min-w-[400px] h-full">
-        <ChatPanel 
-          messages={messages}
-          input={input}
-          handleInputChange={handleInputChange}
-          handleSubmit={handleSubmit}
-          onFileSelectAndUpload={handleFileSelectAndUpload}
-          chatId={parentChatId}
-          isLoading={isLoading || isUploading || isGeneratingQuiz}
-          indexedDocs={indexedDocs}
-          indexedDocCount={indexedDocs.length}
-          selectedDoc={selectedDoc}
-          setSelectedDoc={setSelectedDoc}
-          onGenerateQuiz={handleGenerateQuiz}
-        />
-      </div>
+        <ResizablePanel defaultSize={37.5} minSize={30} className="min-w-[300px]">
+          <div className="h-full px-2">
+            {viewMode === 'chat' && <PDFViewer file={fileToView} isUploading={isUploading || isGeneratingQuiz} />}
+            {viewMode === 'quiz' && quizData && <QuizView quizData={quizData} onSubmit={handleSubmitQuiz} isSubmitting={isSubmittingQuiz}/>}
+            {viewMode === 'result' && quizResult && <QuizResult resultData={quizResult} onFinish={resetToChatView}/>}
+          </div>
+        </ResizablePanel>
+
+        <ResizableHandle withHandle className="bg-gray-300/50 hover:bg-gray-400/60 transition-colors" />
+
+      
+        <ResizablePanel defaultSize={37.5} minSize={30} className="min-w-[300px]">
+          <div className="h-full pl-2">
+            <ChatPanel 
+              messages={messages}
+              input={input}
+              handleInputChange={handleInputChange}
+              handleSubmit={handleSubmit}
+              onFileSelectAndUpload={handleFileSelectAndUpload}
+              chatId={parentChatId}
+              isLoading={isLoading || isUploading || isGeneratingQuiz}
+              indexedDocs={indexedDocs}
+              indexedDocCount={indexedDocs.length}
+              selectedDoc={selectedDoc}
+              setSelectedDoc={setSelectedDoc}
+              onGenerateQuiz={handleGenerateQuiz}
+            />
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
 
       <Dialog open={isDashboardOpen} onOpenChange={setIsDashboardOpen}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-2xl bg-white/95 backdrop-blur-sm">
             <DashboardView />
         </DialogContent>
       </Dialog>

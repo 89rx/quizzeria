@@ -1,10 +1,10 @@
-// src/app/api/progress/route.ts
+
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
 
 export async function GET() {
   try {
-    // Later, you would filter by a specific user_id
+   
     const { data, error } = await supabase
       .from('user_progress')
       .select('*')

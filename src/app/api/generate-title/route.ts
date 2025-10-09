@@ -1,4 +1,4 @@
-// src/app/api/generate-title/route.ts
+
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       return new Response(JSON.stringify({ error: 'chatId is required' }), { status: 400 });
     }
 
-    // 1. Fetch some content from the documents related to this chat
+    
     const { data: documents, error: docError } = await supabase
       .from('documents')
       .select('content')
@@ -27,7 +27,7 @@ export async function POST(req: Request) {
 
     const content = documents.map(doc => doc.content).join('\n\n');
     
-    // 2. Use the AI to generate a title
+    
     const model = new ChatGoogleGenerativeAI({
       apiKey: process.env.GOOGLE_API_KEY,
       modelName: "gemini-2.5-flash",
@@ -41,10 +41,10 @@ export async function POST(req: Request) {
     
     let title = await chain.invoke({ text: content.substring(0, 3000) });
 
-    // Clean up the title (remove quotes, etc.)
+   
     title = title.replace(/"/g, '').trim();
 
-    // 3. Update the chat record in the database with the new title
+    
     const { error: updateError } = await supabase
       .from('chats')
       .update({ title: title })

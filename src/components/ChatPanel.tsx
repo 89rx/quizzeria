@@ -1,6 +1,5 @@
 'use client';
 
-// 1. Import `forwardRef` from React
 import { forwardRef, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,7 +7,7 @@ import { cn } from '@/lib/utils';
 import type { Message } from 'ai/react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Paperclip, Send, Loader2, GraduationCap } from 'lucide-react';
+import { Paperclip, Send, Loader2, GraduationCap, User, Bot } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 interface ChatPanelProps {
@@ -26,12 +25,13 @@ interface ChatPanelProps {
   onGenerateQuiz: () => void;
 }
 
-// 2. Wrap the component definition in `forwardRef`
 export const ChatPanel = forwardRef<HTMLDivElement, ChatPanelProps>(({ messages, input, handleInputChange, handleSubmit, onFileSelectAndUpload, chatId, isLoading, indexedDocs, indexedDocCount, selectedDoc, setSelectedDoc, onGenerateQuiz }, ref) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
+  useEffect(() => { 
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); 
+  }, [messages]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -48,61 +48,152 @@ export const ChatPanel = forwardRef<HTMLDivElement, ChatPanelProps>(({ messages,
   const isFileLimitReached = indexedDocCount >= 5;
 
   return (
-    // 3. Attach the forwarded `ref` to the main div element
-    <div ref={ref} className="flex flex-col h-full bg-white rounded-lg border">
-      <div className="p-4 border-b flex justify-between items-center">
-        <h1 className="font-bold text-lg">Chat</h1>
+    <div ref={ref} className="flex flex-col h-full bg-white rounded-lg border shadow-sm">
+      <div className="p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50 flex justify-between items-center">
+        <h1 className="font-bold text-lg text-gray-800">Chat</h1>
         {chatId && indexedDocs.length > 0 && (
           <Select value={selectedDoc} onValueChange={setSelectedDoc}>
-            <SelectTrigger className="w-[180px]"><SelectValue placeholder="Select a document" /></SelectTrigger>
+            <SelectTrigger className="w-[180px] bg-white">
+              <SelectValue placeholder="Select a document" />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Documents</SelectItem>
-              {indexedDocs.map((docName) => (<SelectItem key={docName} value={docName}>{docName}</SelectItem>))}
+              {indexedDocs.map((docName) => (
+                <SelectItem key={docName} value={docName}>{docName}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         )}
       </div>
-      <div className="flex-1 p-4 overflow-y-auto">
-         <div className="flex flex-col gap-4">
+      
+      <div className="flex-1 p-4 overflow-y-auto bg-gray-50/50">
+        <div className="flex flex-col gap-4">
           {!chatId && messages.length === 0 && (
-            <div className="text-center text-muted-foreground mt-8">
-              <p>Please start a new chat or select an existing one.</p>
-              <p className='text-sm'>To begin, upload one or more PDFs.</p>
+            <div className="text-center text-muted-foreground mt-8 p-6 bg-white rounded-lg border">
+              <Bot className="h-12 w-12 mx-auto mb-4 text-blue-500" />
+              <p className="text-lg font-medium text-gray-700">Welcome to Study Assistant</p>
+              <p className="text-sm text-gray-500 mt-2">Start a new chat and upload PDFs to begin learning</p>
             </div>
           )}
-          {messages.map((m) => ( <div key={m.id} className={cn( 'p-3 rounded-lg text-sm whitespace-pre-wrap max-w-[80%]', m.role === 'user' ? 'bg-blue-600 text-white self-end' : 'bg-gray-100 self-start' )}>{m.content}</div>))}
+          
+          {messages.map((m) => (
+            <div 
+              key={m.id} 
+              className={cn(
+                'flex gap-3 p-4 rounded-lg max-w-[90%] transition-all duration-200',
+                m.role === 'user' 
+                  ? 'bg-blue-600 text-white self-end ml-auto' 
+                  : 'bg-white border shadow-sm self-start'
+              )}
+            >
+              <div className={cn(
+                'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mt-1',
+                m.role === 'user' ? 'bg-blue-700' : 'bg-green-100 text-green-600'
+              )}>
+                {m.role === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                {m.role === 'user' ? (
+                  <div className="whitespace-pre-wrap break-words">{m.content}</div>
+                ) : (
+                  <div className="prose prose-sm max-w-none break-words">
+                    <ReactMarkdown
+                      components={{
+                        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                        ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                        li: ({ children }) => <li className="ml-4">{children}</li>,
+                        strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
+                        em: ({ children }) => <em className="italic text-gray-700">{children}</em>,
+                        code: ({ children }) => <code className="bg-gray-100 rounded px-1 py-0.5 text-sm">{children}</code>,
+                        pre: ({ children }) => <pre className="bg-gray-100 rounded p-3 overflow-x-auto text-sm my-2">{children}</pre>,
+                      }}
+                    >
+                      {m.content}
+                    </ReactMarkdown>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
           <div ref={messagesEndRef} />
         </div>
       </div>
-      <div className="p-4 border-t">
+      
+      <div className="p-4 border-t bg-white">
         <form onSubmit={handleSubmit} className="w-full flex items-center gap-2">
-          <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="application/pdf" className="hidden" multiple disabled={isFileLimitReached || isLoading} />
+          <input 
+            type="file" 
+            ref={fileInputRef} 
+            onChange={handleFileChange} 
+            accept="application/pdf" 
+            className="hidden" 
+            multiple 
+            disabled={isFileLimitReached || isLoading} 
+          />
           
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button type="button" variant="ghost" size="icon" onClick={() => fileInputRef.current?.click()} disabled={isFileLimitReached || isLoading}>
-                  {isLoading && !messages.length ? <Loader2 className="h-5 w-5 animate-spin" /> : <Paperclip className="h-5 w-5" />}
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="icon" 
+                  onClick={() => fileInputRef.current?.click()} 
+                  disabled={isFileLimitReached || isLoading}
+                  className="flex-shrink-0"
+                >
+                  {isLoading && !messages.length ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Paperclip className="h-5 w-5" />
+                  )}
                 </Button>
               </TooltipTrigger>
-              {isFileLimitReached && ( <TooltipContent><p>Maximum of 5 documents per chat reached.</p></TooltipContent> )}
+              {isFileLimitReached && (
+                <TooltipContent>
+                  <p>Maximum of 5 documents per chat reached.</p>
+                </TooltipContent>
+              )}
             </Tooltip>
           </TooltipProvider>
 
-          <Input value={input} onChange={handleInputChange} placeholder={!chatId ? "Upload PDFs to start..." : "Ask a question..."} disabled={isInputDisabled} />
+          <Input 
+            value={input} 
+            onChange={handleInputChange} 
+            placeholder={!chatId ? "Upload PDFs to start..." : "Ask a question about your documents..."} 
+            disabled={isInputDisabled}
+            className="flex-1"
+          />
           
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button type="button" variant="ghost" size="icon" onClick={onGenerateQuiz} disabled={!chatId || isLoading}>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  size="icon" 
+                  onClick={onGenerateQuiz} 
+                  disabled={!chatId || isLoading}
+                  className="flex-shrink-0"
+                >
                   <GraduationCap className="h-5 w-5" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent><p>Generate Quiz from Documents</p></TooltipContent>
+              <TooltipContent>
+                <p>Generate Quiz from Documents</p>
+              </TooltipContent>
             </Tooltip>
           </TooltipProvider>
 
-          <Button type="submit" disabled={isInputDisabled}><Send className="h-5 w-5" /></Button>
+          <Button 
+            type="submit" 
+            disabled={isInputDisabled} 
+            className="flex-shrink-0 bg-blue-600 hover:bg-blue-700"
+          >
+            <Send className="h-5 w-5" />
+          </Button>
         </form>
       </div>
     </div>

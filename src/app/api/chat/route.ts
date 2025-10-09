@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     
     const model = new ChatGoogleGenerativeAI({
       apiKey: process.env.GOOGLE_API_KEY,
-      modelName: "gemini-2.5-flash", // Using stable model
+      modelName: "gemini-2.5-flash", 
       streaming: true,
     });
 

@@ -1,4 +1,4 @@
-// src/components/QuizView.tsx
+
 'use client';
 
 import { useState } from 'react';

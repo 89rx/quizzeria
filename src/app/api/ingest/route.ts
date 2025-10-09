@@ -1,4 +1,4 @@
-// src/app/api/ingest/route.ts
+
 import { NextResponse, type NextRequest } from 'next/server';
 import pdf from 'pdf-parse';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     const splitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000, chunkOverlap: 200 });
     const documents = await splitter.createDocuments([pdfData.text]);
     
-    // Generate and store topics if this is the first document for the chat
+    
     if (isFirstDocument) {
       const model = new ChatGoogleGenerativeAI({ modelName: "gemini-2.5-flash" });
       const prompt = PromptTemplate.fromTemplate(
