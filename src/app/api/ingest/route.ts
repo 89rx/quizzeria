@@ -10,28 +10,21 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
-    let chatId = formData.get('chatId') as string | null;
+    const parentChatId = formData.get('parentChatId') as string | null;
 
-    if (!file) {
-      return NextResponse.json({ success: false, error: 'No file found.' }, { status: 400 });
+    if (!file || !parentChatId) {
+      return NextResponse.json({ success: false, error: 'File or parentChatId not found.' }, { status: 400 });
     }
-
-    if (!chatId) {
-      const { data, error } = await supabase.from('chats').insert({}).select('id').single();
-      if (error) throw new Error(`Could not create a new chat session: ${error.message}`);
-      chatId = data.id;
-    }
+    
+    const compositeChatId = `${parentChatId}_${file.name}`;
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const pdfData = await pdf(buffer);
+
     const splitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000, chunkOverlap: 200 });
     const documents = await splitter.createDocuments([pdfData.text]);
-
-    const embeddings = new GoogleGenerativeAIEmbeddings({
-      apiKey: process.env.GOOGLE_API_KEY,
-      modelName: "text-embedding-004",
-    });
-
+    
+    const embeddings = new GoogleGenerativeAIEmbeddings({ apiKey: process.env.GOOGLE_API_KEY, modelName: "text-embedding-004" });
     const documentContents = documents.map(doc => doc.pageContent);
     const vectors = await embeddings.embedDocuments(documentContents);
 
@@ -39,16 +32,15 @@ export async function POST(request: NextRequest) {
       content: doc.pageContent,
       embedding: vectors[i],
       metadata: { source: file.name },
-      chat_id: chatId
+      chat_id: compositeChatId
     }));
-
+    
     const { error } = await supabase.from('documents').insert(rowsToInsert);
-    if (error) throw new Error(`Error inserting documents: ${error.message}`);
+    if (error) throw new Error(`Error inserting documents for ${file.name}: ${error.message}`);
 
-    return NextResponse.json({ success: true, chatId: chatId });
+    return NextResponse.json({ success: true, parentChatId: parentChatId });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    console.error('[API INGEST] Full Server Error:', errorMessage);
     return NextResponse.json({ success: false, error: `Internal Server Error: ${errorMessage}` }, { status: 500 });
   }
 }

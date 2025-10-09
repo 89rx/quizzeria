@@ -1,13 +1,13 @@
-// src/components/ChatHistory.tsx
 'use client';
 
 import { PlusCircle } from 'lucide-react';
 import { Button } from './ui/button';
 
-// Define the shape of a chat object
+// Add the optional title property to the Chat type
 export type Chat = {
   id: string;
   created_at: string;
+  title?: string | null; 
 };
 
 interface ChatHistoryProps {
@@ -36,7 +36,8 @@ export function ChatHistory({ chats, currentChatId, setCurrentChatId }: ChatHist
               onClick={() => setCurrentChatId(chat.id)}
             >
               <div className="truncate">
-                Chat from {new Date(chat.created_at).toLocaleString()}
+                {/* Display the title, or fall back to a default name */}
+                {chat.title || `Chat from ${new Date(chat.created_at).toLocaleString()}`}
               </div>
             </Button>
           ))

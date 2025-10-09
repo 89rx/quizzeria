@@ -1,27 +1,19 @@
-// src/components/PDFViewer.tsx
 'use client';
 
 import { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
-import { Button } from './ui/button';
 import { Loader2, Upload } from 'lucide-react';
 
-// --- FINAL FIX ---
-// This path now correctly points to the 'pdf.worker.mjs' file.
 pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.mjs';
-// --- END OF FIX ---
-
-console.log('IMPORTED PDF.js API Version:', pdfjs.version);
 
 interface PDFViewerProps {
   file: File | null;
-  handleUpload: () => void;
   isUploading: boolean;
 }
 
-export function PDFViewer({ file, handleUpload, isUploading }: PDFViewerProps) {
+export function PDFViewer({ file, isUploading }: PDFViewerProps) {
   const [numPages, setNumPages] = useState<number | null>(null);
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
@@ -32,15 +24,7 @@ export function PDFViewer({ file, handleUpload, isUploading }: PDFViewerProps) {
     <div className="flex flex-col h-full bg-white rounded-lg border">
       <div className="p-4 border-b flex justify-between items-center">
         <h2 className="font-bold text-lg">Document Viewer</h2>
-        {file && (
-          <Button onClick={handleUpload} disabled={isUploading} size="sm">
-            {isUploading ? (
-              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Indexing...</>
-            ) : (
-              'Index this PDF'
-            )}
-          </Button>
-        )}
+        {isUploading && <Loader2 className="h-5 w-5 animate-spin" />}
       </div>
 
       <div className="flex-1 overflow-y-auto">
@@ -63,7 +47,9 @@ export function PDFViewer({ file, handleUpload, isUploading }: PDFViewerProps) {
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-gray-500">
             <Upload className="h-12 w-12 mb-4" />
-            <p className="text-center">Attach a PDF in the chat box to view it here.</p>
+            <p className="text-center">
+              Upload a document to view it here.
+            </p>
           </div>
         )}
       </div>
