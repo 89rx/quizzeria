@@ -20,6 +20,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'File or parentChatId not found.' }, { status: 400 });
     }
 
+    if (file.size > 4 * 1024 * 1024) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'File too large (max 4MB)' 
+      }, { status: 400 });
+    }
+
+    if (file.type !== 'application/pdf') {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Only PDF files allowed' 
+      }, { status: 400 });
+    }
+
+
     const { data: existingDocs, error: docCheckError } = await supabase
       .from('documents')
       .select('id')
