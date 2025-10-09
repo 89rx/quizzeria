@@ -1,11 +1,19 @@
 {
     "functions": {
       "api/ingest.js": {
-        "maxDuration": 30,
-        "memory": 3008
+        "maxDuration": 10
       },
       "api/chat.js": {
-        "maxDuration": 30
+        "maxDuration": 10
+      },
+      "api/generate-quiz.js": {
+        "maxDuration": 10
+      },
+      "api/submit-quiz.js": {
+        "maxDuration": 10
+      },
+      "api/progress.js": {
+        "maxDuration": 10
       }
     }
   }
