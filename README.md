@@ -47,11 +47,11 @@ Start the server
 
 To run this project, you will need to add the following environment variables to your .env.local file
 
-NEXT_PUBLIC_SUPABASE_URL=https://afcwhoinwxtmlxatopfk.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=<!your supabase link>
 
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFmY3dob2lud3h0bWx4YXRvcGZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk3NzQ0NzMsImV4cCI6MjA3NTM1MDQ3M30.611kXJmAzyA3-UMQoEgne6MWf8gxwQtAhbhIlRP9vHo
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<!your supabase anon key>
 
-GOOGLE_API_KEY=AIzaSyA3_LM-vTopWkioMbXvvKCdbzVQIyrBtJA
+GOOGLE_API_KEY=<!your google gemini api key>
 
 ## Features
 
