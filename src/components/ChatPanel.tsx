@@ -221,7 +221,7 @@ export const ChatPanel = forwardRef<HTMLDivElement, ChatPanelProps>(({ messages,
         
         
         <div className="mt-2 text-xs text-gray-500 text-center">
-          <p>PDF files must be under 3MB • Max 5 documents per chat</p>
+          <p>PDF files must be under 1MB • Max 5 documents per chat</p>
         </div>
       </div>
     </div>
