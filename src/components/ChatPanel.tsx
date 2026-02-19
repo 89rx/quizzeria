@@ -38,9 +38,9 @@ export const ChatPanel = forwardRef<HTMLDivElement, ChatPanelProps>(({ messages,
     if (files && files.length > 0) {
       
       
-      const oversizedFiles = Array.from(files).filter(file => file.size > 3 * 1024 * 1024);
+      const oversizedFiles = Array.from(files).filter(file => file.size > 1 * 1024 * 1024);
       if (oversizedFiles.length > 0) {
-        alert(`Some files exceed the 3MB limit:\n${oversizedFiles.map(f => `• ${f.name} (${(f.size / 1024 / 1024).toFixed(1)}MB)`).join('\n')}\n\nPlease upload smaller PDF files.`);
+        alert(`Some files exceed the 1MB limit:\n${oversizedFiles.map(f => `• ${f.name} (${(f.size / 1024 / 1024).toFixed(1)}MB)`).join('\n')}\n\nPlease upload smaller PDF files.`);
         
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
@@ -93,7 +93,7 @@ export const ChatPanel = forwardRef<HTMLDivElement, ChatPanelProps>(({ messages,
               <p className="text-lg font-medium text-gray-700">Welcome to Study Assistant</p>
               <p className="text-sm text-gray-500 mt-2">Start a new chat and upload PDFs to begin learning</p>
               <div className="mt-4 text-xs text-gray-400 bg-blue-50 p-3 rounded border">
-                <p><strong>Note:</strong> PDF files must be under 3MB</p>
+                <p><strong>Note:</strong> PDF files must be under 1MB</p>
               </div>
             </div>
           )}
@@ -174,7 +174,7 @@ export const ChatPanel = forwardRef<HTMLDivElement, ChatPanelProps>(({ messages,
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Upload PDF files (max 3MB each)</p>
+                <p>Upload PDF files (max 1MB each)</p>
                 {isFileLimitReached && (
                   <p className="text-red-500">Maximum of 5 documents reached</p>
                 )}

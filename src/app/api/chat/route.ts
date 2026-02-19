@@ -39,13 +39,13 @@ export async function POST(req: Request) {
     
     const model = new ChatGoogleGenerativeAI({
       apiKey: process.env.GOOGLE_API_KEY,
-      modelName: "gemini-2.5-flash", 
+      model: "gemini-2.5-flash", 
       streaming: true,
     });
 
     const embeddings = new GoogleGenerativeAIEmbeddings({
       apiKey: process.env.GOOGLE_API_KEY,
-      modelName: "text-embedding-004",
+      model: "gemini-embedding-001",
     });
 
     let chatIdPattern: string;

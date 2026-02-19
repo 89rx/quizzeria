@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { ChatGoogleGenerativeAI } from '@langchain/google-genai';
 import { PromptTemplate } from '@langchain/core/prompts';
 import { z } from 'zod';
-import { StructuredOutputParser } from 'langchain/output_parsers';
+import { StructuredOutputParser } from '@langchain/core/output_parsers';
 import { StringOutputParser } from '@langchain/core/output_parsers';
 
 export const maxDuration = 300;
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
 
     const model = new ChatGoogleGenerativeAI({
       apiKey: process.env.GOOGLE_API_KEY,
-      modelName: "gemini-2.5-flash",
+      model: "gemini-2.5-flash",
       temperature: 0.5,
     });
     
